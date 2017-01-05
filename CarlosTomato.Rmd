@@ -1,0 +1,144 @@
+---
+title: "Tomato for Carlos"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, autodep = TRUE)
+```
+
+```{r}
+library(rstan)
+library(rethinking)
+library(brms)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+```
+
+```{r}
+tomato <- read.csv("Assignment_Chapter_09/TomatoR2CSHL.csv")
+summary(tomato)
+```
+
+```{r, results='hide'}
+hyp1 <- brm(hyp ~ acs*trt + (trt|species) + (1|shelf),
+            prior = c(
+              set_prior("normal(20,10)",class="Intercept"),
+              set_prior("normal(0,10)",class="b"),
+              set_prior("cauchy(0,1)",class="sigma")
+            ),
+            iter=5000,
+            warmup=1500,
+            data=tomato)
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+hyp2 <- brm(hyp ~ acs*trt + (1|species) + (1|shelf),
+            prior = c(
+              set_prior("normal(20,10)",class="Intercept"),
+              set_prior("normal(0,10)",class="b"),
+              set_prior("cauchy(0,1)",class="sigma")
+            ),
+            iter=5000,
+            warmup=1500,
+            data=tomato)
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+hyp3 <- update(hyp1, formula. = hyp ~ acs*trt + (1|species))
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+hyp4 <- update(hyp1, formula. = hyp ~ acs*trt + (1|shelf))
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+loo(hyp1,hyp2,hyp3,hyp4)
+```
+
+So we should go with hyp4 (no species effect)
+```{r}
+summary(hyp4)
+plot(hyp4, ask=FALSE)
+ranef(hyp4)
+```
+
+```{r}
+pred.df <- unique(tomato[,c("species","acs","trt")])
+head(pred.df)
+hyp.prediction <- cbind(pred.df,predict(hyp4,newdata = pred.df, re_formula = NA))
+colnames(hyp.prediction)[6:7] <- c("low95","high95")
+head(hyp.prediction)
+```
+
+```{r}
+pl <- ggplot(hyp.prediction,aes(x=acs,y=Estimate,ymin=low95,ymax=high95, fill=trt))
+pl <- pl + geom_bar(position="dodge",stat="identity")
+pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
+pl <- pl + facet_wrap( ~ species, ncol=2, scales="free_x")
+pl + ggtitle("hypocotyls")
+```
+
+```{r, results='hide'}
+by(tomato$intleng,tomato$trt,mean)
+int1 <- brm(intleng ~ acs*trt + (trt|species) + (1|shelf),
+            prior = c(
+              set_prior("normal(10,10)",class="Intercept"),
+              set_prior("normal(0,20)",class="b"),
+              set_prior("cauchy(0,1)",class="sigma")
+            ),
+            iter=5000,
+            warmup=1500,
+            data=tomato)
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+int2 <- update(int1, formula. = intleng ~ acs*trt + (1|species) + (1|shelf))
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+int3 <- update(int2, formula. = intleng ~ acs*trt + (1|species))
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+int4 <- update(int3, formula. = intleng ~ acs*trt + (1|shelf))
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+int5 <- update(int1, formula. = intleng ~ acs*trt)
+save.image(file="carlos.Rdata")
+```
+
+```{r}
+loo(int1,int2,int3,int4,int5)
+```
+
+So we should go with int4 (no species effect).  Case could also be made for int5 (no random effects)
+```{r}
+summary(int4)
+plot(int4, ask=FALSE)
+ranef(int4)
+```
+
+```{r}
+int.prediction <- cbind(pred.df,predict(int4,newdata = pred.df, re_formula = NA))
+colnames(intleng.prediction)[6:7] <- c("low95","high95")
+head(intleng.prediction)
+```
+
+```{r}
+pl <- ggplot(intleng.prediction,aes(x=acs,y=Estimate,ymin=low95,ymax=high95, fill=trt))
+pl <- pl + geom_bar(position="dodge",stat="identity")
+pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
+pl <- pl + facet_wrap( ~ species, ncol=2, scales="free_x")
+pl + ggtitle("intocotyls")
+```
+
