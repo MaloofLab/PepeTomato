@@ -16,7 +16,7 @@ options(mc.cores = parallel::detectCores())
 ```
 
 ```{r}
-tomato <- read.csv("Assignment_Chapter_09/TomatoR2CSHL.csv")
+tomato <- read.csv("TomatoR2CSHL.csv")
 summary(tomato)
 ```
 
@@ -30,7 +30,7 @@ hyp1 <- brm(hyp ~ acs*trt + (trt|species) + (1|shelf),
             iter=5000,
             warmup=1500,
             data=tomato)
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
@@ -43,17 +43,17 @@ hyp2 <- brm(hyp ~ acs*trt + (1|species) + (1|shelf),
             iter=5000,
             warmup=1500,
             data=tomato)
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 hyp3 <- update(hyp1, formula. = hyp ~ acs*trt + (1|species))
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 hyp4 <- update(hyp1, formula. = hyp ~ acs*trt + (1|shelf))
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
@@ -94,27 +94,27 @@ int1 <- brm(intleng ~ acs*trt + (trt|species) + (1|shelf),
             iter=5000,
             warmup=1500,
             data=tomato)
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 int2 <- update(int1, formula. = intleng ~ acs*trt + (1|species) + (1|shelf))
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 int3 <- update(int2, formula. = intleng ~ acs*trt + (1|species))
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 int4 <- update(int3, formula. = intleng ~ acs*trt + (1|shelf))
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
 int5 <- update(int1, formula. = intleng ~ acs*trt)
-save.image(file="carlos.Rdata")
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
