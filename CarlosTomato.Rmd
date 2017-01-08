@@ -13,6 +13,7 @@ library(rethinking)
 library(brms)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
+load("~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
@@ -57,7 +58,12 @@ save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
-loo(hyp1,hyp2,hyp3,hyp4)
+hyp5 <- update(hyp1, formula. = hyp ~ acs*trt)
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r}
+loo(hyp1,hyp2,hyp3,hyp4,hyp5)
 ```
 
 So we should go with hyp4 (no species effect)
