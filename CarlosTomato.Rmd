@@ -1,6 +1,6 @@
 ---
 title: "Tomato for Carlos"
-output: pdf_document
+output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
@@ -135,7 +135,7 @@ ranef(int4)
 ```
 
 ```{r}
-int.prediction <- cbind(pred.df,predict(int4,newdata = pred.df, re_formula = NA))
+intleng.prediction <- cbind(pred.df,predict(int4,newdata = pred.df, re_formula = NA))
 colnames(intleng.prediction)[6:7] <- c("low95","high95")
 head(intleng.prediction)
 ```
@@ -145,6 +145,97 @@ pl <- ggplot(intleng.prediction,aes(x=acs,y=Estimate,ymin=low95,ymax=high95, fil
 pl <- pl + geom_bar(position="dodge",stat="identity")
 pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
 pl <- pl + facet_wrap( ~ species, ncol=2, scales="free_x")
-pl + ggtitle("intocotyls")
+pl + ggtitle("internode")
 ```
 
+## species level analyses
+
+### hypocotyl
+
+```{r, results='hide'}
+hyp6 <- brm(hyp ~ species*trt + (trt|acs) + (1|shelf),
+            prior = c(
+              set_prior("normal(20,10)",class="Intercept"),
+              set_prior("normal(0,10)",class="b"),
+              set_prior("cauchy(0,1)",class="sigma")
+            ),
+            iter=5000,
+            warmup=1500,
+            data=tomato)
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+hyp7 <- update(hyp6, formula. = . ~ species*trt + (1|acs) + (1|shelf) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+
+```{r, results='hide'}
+hyp8 <- update(hyp7, formula. = . ~ species*trt + (1|shelf) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+hyp9 <- update(hyp7, formula. = . ~ species*trt + (1|acs) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+hyp10 <- update(hyp7, formula. = . ~ species*trt)
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r}
+summary(hyp6)
+summary(hyp7)
+summary(hyp8)
+summary(hyp9)
+summary(hyp10)
+```
+
+
+```{r}
+loo(hyp6,hyp7,hyp8,hyp9,hyp10)
+```
+
+
+### internode
+
+```{r, results='hide'}
+int6 <- brm(intleng ~ species*trt + (trt|acs) + (1|shelf),
+            prior = c(
+              set_prior("normal(20,10)",class="Intercept"),
+              set_prior("normal(0,10)",class="b"),
+              set_prior("cauchy(0,1)",class="sigma")
+            ),
+            iter=5000,
+            warmup=1500,
+            data=tomato)
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+int7 <- update(int6, formula. = . ~ species*trt + (1|acs) + (1|shelf) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+
+```{r, results='hide'}
+int8 <- update(int7, formula. = . ~ species*trt + (1|shelf) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+int9 <- update(int7, formula. = . ~ species*trt + (1|acs) )
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r, results='hide'}
+int10 <- update(int7, formula. = . ~ species*trt)
+save.image(file="~/Google Drive/Rdata/carlos.Rdata")
+```
+
+```{r}
+loo(int6,int7,int8,int9,int10)
+```
