@@ -13,6 +13,7 @@ library(rethinking)
 library(brms)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
+if(file.exists("~/Google Drive/Rdata/carlos.Rdata")) load("~/Google Drive/Rdata/carlos.Rdata")
 ```
 
 ```{r}
