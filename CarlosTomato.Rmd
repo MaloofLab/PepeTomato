@@ -1,7 +1,7 @@
 ---
 title: "Tomato for Carlos"
 output: html_notebook
----
+--- 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE, autodep = TRUE)
@@ -76,9 +76,10 @@ ranef(hyp4)
 ```{r}
 pred.df <- unique(tomato[,c("species","acs","trt")])
 head(pred.df)
-hyp.prediction <- cbind(pred.df,predict(hyp4,newdata = pred.df, re_formula = NA))
+hyp.prediction <- cbind(pred.df,fitted(hyp4,newdata = pred.df, re_formula = NA))
 colnames(hyp.prediction)[6:7] <- c("low95","high95")
 head(hyp.prediction)
+write.csv(hyp.prediction,file="hyp_accession.csv")
 ```
 
 ```{r}
@@ -86,7 +87,8 @@ pl <- ggplot(hyp.prediction,aes(x=acs,y=Estimate,ymin=low95,ymax=high95, fill=tr
 pl <- pl + geom_bar(position="dodge",stat="identity")
 pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
 pl <- pl + facet_wrap( ~ species, ncol=2, scales="free_x")
-pl + ggtitle("hypocotyls")
+pl + ggtitle("hypocotyls per accession")
+ggsave("hypocotyls_accession.pdf",height=11,width=8.5)
 ```
 
 ```{r, results='hide'}
@@ -135,9 +137,10 @@ ranef(int4)
 ```
 
 ```{r}
-intleng.prediction <- cbind(pred.df,predict(int4,newdata = pred.df, re_formula = NA))
+intleng.prediction <- cbind(pred.df,fitted(int4,newdata = pred.df, re_formula = NA))
 colnames(intleng.prediction)[6:7] <- c("low95","high95")
 head(intleng.prediction)
+write.csv(intleng.prediction,file="intleng_accession.csv")
 ```
 
 ```{r}
@@ -146,6 +149,7 @@ pl <- pl + geom_bar(position="dodge",stat="identity")
 pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
 pl <- pl + facet_wrap( ~ species, ncol=2, scales="free_x")
 pl + ggtitle("internode")
+ggsave("internodes_accession.pdf",height=11,width=8.5)
 ```
 
 ## species level analyses
@@ -188,17 +192,49 @@ save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 
 ```{r}
 summary(hyp6)
-summary(hyp7)
-summary(hyp8)
-summary(hyp9)
-summary(hyp10)
 ```
 
+```{r}
+summary(hyp7)
+```
+
+```{r}
+summary(hyp8)
+```
+
+```{r}
+summary(hyp9)
+```
+
+```{r}
+summary(hyp10)
+```
 
 ```{r}
 loo(hyp6,hyp7,hyp8,hyp9,hyp10)
 ```
 
+hyp6, 7 equivalent (no need for trt|acs)
+hyp8, 10 much worse (keep acs intercept random effect)
+hyp9 a bit worse (some evidenc for shelf effects)
+
+go with hyp7
+
+```{r}
+pred.df.species <- unique(tomato[,c("species","trt")])
+hyp.species.prediction <- cbind(pred.df.species,fitted(hyp7,newdata = pred.df.species, re_formula = NA))
+colnames(hyp.species.prediction)[5:6] <- c("low95","high95")
+head(hyp.species.prediction)
+write.csv(hyp.species.prediction,file="hyp_species.csv")
+```
+
+```{r}
+pl <- ggplot(hyp.species.prediction,aes(x=species,y=Estimate,ymin=low95,ymax=high95, fill=trt))
+pl <- pl + geom_bar(position="dodge",stat="identity")
+pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
+pl + ggtitle("hypocotyls per species")
+ggsave("hypocotyls_species.pdf",height=11,width=8.5)
+```
 
 ### internode
 
@@ -238,4 +274,21 @@ save.image(file="~/Google Drive/Rdata/carlos.Rdata")
 
 ```{r}
 loo(int6,int7,int8,int9,int10)
+```
+
+int6 is best
+
+```{r}
+int.species.prediction <- cbind(pred.df.species,fitted(int6,newdata = pred.df.species, re_formula = NA))
+colnames(int.species.prediction)[5:6] <- c("low95","high95")
+head(int.species.prediction)
+write.csv(int.species.prediction,file="int_species.csv")
+```
+
+```{r}
+pl <- ggplot(int.species.prediction,aes(x=species,y=Estimate,ymin=low95,ymax=high95, fill=trt))
+pl <- pl + geom_bar(position="dodge",stat="identity")
+pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
+pl + ggtitle("internode per species")
+ggsave("internodes_species.pdf",height=11,width=8.5)
 ```
