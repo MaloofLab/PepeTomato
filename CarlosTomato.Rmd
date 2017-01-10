@@ -233,7 +233,7 @@ pl <- ggplot(hyp.species.prediction,aes(x=species,y=Estimate,ymin=low95,ymax=hig
 pl <- pl + geom_bar(position="dodge",stat="identity")
 pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
 pl + ggtitle("hypocotyls per species")
-ggsave("hypocotyls_species.pdf",height=11,width=8.5)
+ggsave("hypocotyls_species.pdf")
 ```
 
 ### internode
@@ -290,5 +290,5 @@ pl <- ggplot(int.species.prediction,aes(x=species,y=Estimate,ymin=low95,ymax=hig
 pl <- pl + geom_bar(position="dodge",stat="identity")
 pl <- pl + geom_errorbar(position=position_dodge(width=.9), width=0.5)
 pl + ggtitle("internode per species")
-ggsave("internodes_species.pdf",height=11,width=8.5)
+ggsave("internodes_species.pdf")
 ```
